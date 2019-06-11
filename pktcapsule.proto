@@ -1,0 +1,50 @@
+/**
+ * pktcapsule.proto
+ *
+ * pktcapsule is the server to encapsulate or decapsulate packet data with
+ * IPinIP.
+ * Currently, we support IPv4 only.
+ */
+syntax = "proto3";
+
+package pktcapsule;
+
+/**
+ * Service PktCapsule encapsulates or decapsulates given packet data.
+ */
+service PktCapsule {
+    // Encapsulate adds newly IP header to the given packet data.
+    rpc Encapsulate(EncapsulateRequest) returns (Packet) {}
+    // Decapsulate removes outer IP header from the given packet data.
+    rpc Decapsulate(DecapsulateRequest) returns (Packet) {}
+}
+
+/**
+ * Message Packet represents the packet data.
+ */
+message Packet {
+    // Encapsulated/Decapsulated packet data.
+    bytes data = 1;
+}
+
+/**
+ * Message EncapsulateRequest represents the request message for Encapsulate
+ * method.
+ */
+message EncapsulateRequest {
+    // Packet data which will be encapsulated. Linklayer header must be removed.
+    bytes data = 1;
+    // Source IP address which will be used in newly added IP header.
+    fixed32 src_ip = 2;
+    // Destination IP address which will be used in newly added IP header.
+    fixed32 dst_ip = 3;
+}
+
+/**
+ * Message DecapsulateRequest represents the request message for Decapsulate
+ * method.
+ */
+message DecapsulateRequest {
+    // Packet data which will be decapsulated. Linklayer header must be removed.
+    bytes data = 1;
+}
