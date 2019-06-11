@@ -1,5 +1,13 @@
 GOBIN := go
 PROTOBIN := protoc
+PKTCAPSULED := pktcapsuled
+
+.PHONY: all
+all: build-grpc build doc
+
+.PHONY: build
+build:
+	$(GOBIN) build -o $(PKTCAPSULED) ./cmd/pktcapsuled
 
 .PHONY: build-grpc
 build-grpc:
