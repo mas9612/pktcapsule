@@ -16,3 +16,7 @@ build-grpc:
 .PHONY: doc
 doc:
 	$(PROTOBIN) --doc_out=./doc --doc_opt=markdown,pktcapsule.md ./pktcapsule.proto
+
+.PHONY: test
+test:
+	$(GOBIN) test -v ./...
