@@ -128,6 +128,7 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 	return b, nil
 }
 
-func Decapsulate(data []byte, srcIP net.IP, dstIP net.IP) []byte {
-	return []byte{}
+// Decapsulate removes outer IP header from the given packet data.
+func Decapsulate(data []byte) ([]byte, error) {
+	return data[20:], nil
 }
