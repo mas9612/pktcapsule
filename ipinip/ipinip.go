@@ -2,9 +2,23 @@ package ipinip
 
 import (
 	"encoding/binary"
-	"errors"
+	"fmt"
+	"math/rand"
 	"net"
+	"time"
+
+	"github.com/pkg/errors"
 )
+
+var (
+	ident int32
+)
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	ident = rand.Int31n(0x10000)
+	fmt.Println(ident)
+}
 
 // IPHeader represents the IPv4 header.
 type IPHeader struct {
@@ -29,6 +43,9 @@ type IPHeader struct {
 // Serialize returns the slice of bytes of IPHeader struct.
 // If IHL field is less than 5 (invalid value), empty slice will be returned.
 // Currently, IP option is not supported and will be ignored.
+//
+// HeaderChecksum field will be filled when Serialize is called.
+// So you should not assign any value to HeaderChecksum field manually.
 func (h IPHeader) Serialize() []byte {
 	if h.IHL < 5 {
 		return []byte{}
@@ -44,9 +61,11 @@ func (h IPHeader) Serialize() []byte {
 	b[7] = uint8(h.FlagmentOffset & 0xff)
 	b[8] = h.TimeToLive
 	b[9] = h.Protocol
-	binary.BigEndian.PutUint16(b[10:], h.HeaderChecksum)
 	copy(b[12:], h.SrcAddress.To4())
 	copy(b[16:], h.DstAddress.To4())
+
+	c := checksum(b)
+	binary.BigEndian.PutUint16(b[10:], c)
 
 	return b
 }
@@ -75,8 +94,38 @@ func Deserialize(data []byte) (IPHeader, error) {
 	return hdr, nil
 }
 
-func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) []byte {
-	return []byte{}
+func identification() uint16 {
+	ident++
+	if ident > 0xffff {
+		ident = 0
+	}
+	return uint16(ident)
+}
+
+// Encapsulate adds newly IP header to the given packet data.
+func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
+	inner, err := Deserialize(data)
+	if err != nil {
+		return []byte{}, errors.Wrap(err, "Encapsulate failed")
+	}
+
+	outer := IPHeader{
+		Version:        4,
+		IHL:            5,
+		TotalLength:    inner.TotalLength + 20,
+		Identification: identification(),
+		Flags:          FlagDontFragment,
+		TimeToLive:     inner.TimeToLive - 1,
+		Protocol:       ProtoIP,
+		SrcAddress:     srcIP,
+		DstAddress:     dstIP,
+	}
+	outerHdr := outer.Serialize()
+
+	b := make([]byte, outer.TotalLength)
+	copy(b, outerHdr)
+	copy(b[20:], data)
+	return b, nil
 }
 
 func Decapsulate(data []byte, srcIP net.IP, dstIP net.IP) []byte {
