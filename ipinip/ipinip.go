@@ -2,7 +2,6 @@ package ipinip
 
 import (
 	"encoding/binary"
-	"fmt"
 	"math/rand"
 	"net"
 	"time"
@@ -17,7 +16,6 @@ var (
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	ident = rand.Int31n(0x10000)
-	fmt.Println(ident)
 }
 
 // IPHeader represents the IPv4 header.

@@ -15,6 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 	grpcServer := grpc.NewServer()
+	// TODO: add logger
 	pb.RegisterPktCapsuleServer(grpcServer, &pktcapsuleServer{})
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatal(err)
