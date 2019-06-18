@@ -3,7 +3,7 @@ PROTOBIN := protoc
 PKTCAPSULED := pktcapsuled
 
 .PHONY: all
-all: build-grpc build doc
+all: build-grpc test build doc
 
 .PHONY: build
 build:
