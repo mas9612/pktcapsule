@@ -7,7 +7,7 @@ all: build-grpc test build doc
 
 .PHONY: build
 build:
-	$(GOBIN) build -o $(PKTCAPSULED) ./cmd/pktcapsuled
+	CGO_ENABLED=0 $(GOBIN) build -o $(PKTCAPSULED) ./cmd/pktcapsuled
 
 .PHONY: build-grpc
 build-grpc:
