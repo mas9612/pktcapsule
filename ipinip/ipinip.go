@@ -112,6 +112,7 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 	outer := IPHeader{
 		Version:        4,
 		IHL:            5,
+		TypeOfService:  inner.TypeOfService,
 		TotalLength:    inner.TotalLength + 20,
 		Identification: identification(),
 		Flags:          FlagDontFragment,
