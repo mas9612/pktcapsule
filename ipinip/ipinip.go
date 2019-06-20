@@ -106,6 +106,8 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Encapsulate failed")
 	}
+	inner.TimeToLive--
+	innerHdr := inner.Serialize()
 
 	outer := IPHeader{
 		Version:        4,
@@ -113,7 +115,7 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 		TotalLength:    inner.TotalLength + 20,
 		Identification: identification(),
 		Flags:          FlagDontFragment,
-		TimeToLive:     inner.TimeToLive - 1,
+		TimeToLive:     inner.TimeToLive, // TTL has already decremented above
 		Protocol:       ProtoIP,
 		SrcAddress:     srcIP,
 		DstAddress:     dstIP,
@@ -122,7 +124,11 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 
 	b := make([]byte, outer.TotalLength)
 	copy(b, outerHdr)
-	copy(b[20:], data)
+	copy(b[20:], innerHdr)
+
+	dataOffset := inner.IHL * 4
+	copy(b[20+dataOffset:], data[dataOffset:])
+
 	return b, nil
 }
 
