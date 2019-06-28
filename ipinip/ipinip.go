@@ -29,7 +29,7 @@ type IPHeader struct {
 	Identification uint16
 	// Note: Only lower 3 bits are used.
 	Flags uint8
-	// Note: Higher-3 bits is not used.
+	// Note: Higher-3 bits are not used.
 	FlagmentOffset uint16
 	TimeToLive     uint8
 	Protocol       uint8
@@ -116,7 +116,7 @@ func Encapsulate(data []byte, srcIP net.IP, dstIP net.IP) ([]byte, error) {
 		TotalLength:    inner.TotalLength + 20,
 		Identification: identification(),
 		Flags:          FlagDontFragment,
-		TimeToLive:     inner.TimeToLive, // TTL has already decremented above
+		TimeToLive:     DefaultTTL,
 		Protocol:       ProtoIP,
 		SrcAddress:     srcIP,
 		DstAddress:     dstIP,

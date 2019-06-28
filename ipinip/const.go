@@ -10,4 +10,8 @@ const (
 	// ProtoIP is the protocol number which is used in IP header.
 	// This shows this packet is IPinIP packet and payload is also IP packet.
 	ProtoIP = 4
+
+	// DefaultTTL is the default Time To Live value for the IPv4 header.
+	// This value is recommended in RFC 1700 "IP TIME TO LIVE PARAMETER".
+	DefaultTTL = 64
 )
