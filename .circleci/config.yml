@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
-    working_directory: /pktcapsule
+    working_directory: /home/circleci/pktcapsule
     steps:
       - checkout
 
@@ -14,7 +14,7 @@ jobs:
   golint:
     docker:
       - image: circleci/golang:1.9
-    working_directory: /pktcapsule
+    working_directory: /home/circleci/pktcapsule
     steps:
       - checkout
 
